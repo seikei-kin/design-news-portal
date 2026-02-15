@@ -1,0 +1,49 @@
+---
+import { format, parseISO } from 'date-fns';
+import { ja } from 'date-fns/locale';
+import { CATEGORIES } from '../types/article';
+import type { Article } from '../types/article';
+import SourceBadge from './SourceBadge.astro';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+
+let formattedDate: string;
+try {
+  formattedDate = format(parseISO(article.publishedAt), 'yyyy年M月d日', { locale: ja });
+} catch {
+  formattedDate = '';
+}
+
+const categoryLabel = CATEGORIES[article.category];
+---
+
+<article class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+  <div class="flex items-center gap-2 flex-wrap">
+    <SourceBadge source={article.source} isJapanese={article.isJapanese} />
+    <span class="text-xs font-medium text-blue-700 bg-blue-50 rounded-full px-2.5 py-0.5">
+      {categoryLabel}
+    </span>
+  </div>
+  <h2 class="text-base font-bold leading-snug">
+    <a
+      href={article.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-gray-900 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+    >
+      {article.title}
+    </a>
+  </h2>
+  {article.description && (
+    <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">{article.description}</p>
+  )}
+  {formattedDate && (
+    <time datetime={article.publishedAt} class="text-xs text-gray-400 mt-auto">
+      {formattedDate}
+    </time>
+  )}
+</article>

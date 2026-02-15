@@ -1,0 +1,42 @@
+---
+import { CATEGORIES, type CategorySlug } from '../types/article';
+
+interface Props {
+  current?: CategorySlug;
+}
+
+const { current } = Astro.props;
+
+const categories = Object.entries(CATEGORIES) as [CategorySlug, string][];
+---
+
+<nav aria-label="カテゴリフィルタ" class="flex flex-wrap gap-2">
+  <a
+    href="/"
+    class:list={[
+      'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+      !current
+        ? 'bg-blue-600 text-white'
+        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    ]}
+    aria-current={!current ? 'page' : undefined}
+  >
+    すべて
+  </a>
+  {categories.map(([slug, label]) => (
+    <a
+      href={`/category/${slug}/`}
+      class:list={[
+        'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+        current === slug
+          ? 'bg-blue-600 text-white'
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+      ]}
+      aria-current={current === slug ? 'page' : undefined}
+    >
+      {label}
+    </a>
+  ))}
+</nav>

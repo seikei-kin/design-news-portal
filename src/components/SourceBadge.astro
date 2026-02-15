@@ -1,0 +1,13 @@
+---
+interface Props {
+  source: string;
+  isJapanese: boolean;
+}
+
+const { source, isJapanese } = Astro.props;
+---
+
+<span class="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full px-2.5 py-0.5">
+  {source}
+  {isJapanese && <span class="text-[10px] bg-red-100 text-red-700 rounded px-1">JP</span>}
+</span>

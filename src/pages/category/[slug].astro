@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryFilter from '../../components/CategoryFilter.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { CATEGORIES, type CategorySlug } from '../../types/article';
+import type { Article } from '../../types/article';
+import type { GetStaticPaths } from 'astro';
+
+import articlesData from '../../data/articles.json';
+const allArticles = articlesData as Article[];
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return Object.keys(CATEGORIES).map((slug) => ({
+    params: { slug },
+  }));
+};
+
+const { slug } = Astro.params;
+const categorySlug = slug as CategorySlug;
+const categoryLabel = CATEGORIES[categorySlug];
+const articles = allArticles.filter((a) => a.category === categorySlug);
+---
+
+<BaseLayout title={categoryLabel} description={`${categoryLabel}に関する最新ニュース`}>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-bold mb-4">{categoryLabel}</h1>
+      <CategoryFilter current={categorySlug} />
+    </div>
+
+    <p class="text-sm text-gray-500">{articles.length}件の記事</p>
+
+    {articles.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {articles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-500 text-center py-12">このカテゴリの記事はまだありません。</p>
+    )}
+  </div>
+</BaseLayout>
