@@ -1,0 +1,55 @@
+---
+import { format, parseISO } from 'date-fns';
+import { ja } from 'date-fns/locale';
+import ArticleCard from './ArticleCard.astro';
+import type { Article } from '../types/article';
+
+interface Props {
+  articles: Article[];
+  emptyMessage?: string;
+}
+
+const { articles, emptyMessage = '記事はまだありません。' } = Astro.props;
+
+// 日付文字列（yyyy-MM-dd）でグループ化
+const grouped = new Map<string, { label: string; dateStr: string; articles: Article[] }>();
+
+for (const article of articles) {
+  let dateKey: string;
+  let label: string;
+  try {
+    const date = parseISO(article.publishedAt);
+    dateKey = format(date, 'yyyy-MM-dd');
+    label = format(date, 'yyyy年M月d日（E）', { locale: ja });
+  } catch {
+    dateKey = 'unknown';
+    label = '日付不明';
+  }
+  if (!grouped.has(dateKey)) {
+    grouped.set(dateKey, { label, dateStr: dateKey, articles: [] });
+  }
+  grouped.get(dateKey)!.articles.push(article);
+}
+
+const groups = [...grouped.values()];
+---
+
+{articles.length > 0 ? (
+  <div class="space-y-8" data-article-grid>
+    {groups.map((group) => (
+      <section>
+        <h2 class="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4" data-date-heading>
+          <time datetime={group.dateStr}>{group.label}</time>
+          <span class="text-sm font-normal text-gray-500 ml-2">{group.articles.length}件</span>
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-view-grid>
+          {group.articles.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+) : (
+  <p class="text-gray-500 text-center py-12">{emptyMessage}</p>
+)}

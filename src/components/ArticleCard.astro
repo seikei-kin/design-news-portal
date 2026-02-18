@@ -21,29 +21,77 @@ try {
 const categoryLabel = CATEGORIES[article.category];
 ---
 
-<article class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
-  <div class="flex items-center gap-2 flex-wrap">
-    <SourceBadge source={article.source} isJapanese={article.isJapanese} />
-    <span class="text-xs font-medium text-blue-700 bg-blue-50 rounded-full px-2.5 py-0.5">
-      {categoryLabel}
-    </span>
+<article class="article-item bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow" data-lang={article.isJapanese ? 'ja' : 'global'}>
+  <!-- カード表示用 -->
+  <div class="card-view">
+    <div class="flex items-center gap-2 flex-wrap mb-3">
+      <SourceBadge source={article.source} isJapanese={article.isJapanese} />
+      <span class="text-xs font-medium text-blue-800 bg-blue-100 border border-blue-300 rounded-full px-2.5 py-0.5">
+        {categoryLabel}
+      </span>
+    </div>
+    <h2 class="text-base font-bold leading-snug">
+      <a
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-gray-900 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+      >
+        {article.title}<span class="sr-only">（新しいタブで開く）</span>
+      </a>
+    </h2>
+    {article.description && (
+      <p class="text-sm text-gray-600 leading-relaxed line-clamp-3 mt-3">{article.description}</p>
+    )}
+    {formattedDate && (
+      <time datetime={article.publishedAt} class="text-xs text-gray-500 mt-auto pt-3">
+        {formattedDate}
+      </time>
+    )}
   </div>
-  <h2 class="text-base font-bold leading-snug">
-    <a
-      href={article.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-gray-900 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
-    >
-      {article.title}
-    </a>
-  </h2>
-  {article.description && (
-    <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">{article.description}</p>
-  )}
-  {formattedDate && (
-    <time datetime={article.publishedAt} class="text-xs text-gray-400 mt-auto">
-      {formattedDate}
-    </time>
-  )}
+  <!-- リスト表示用 -->
+  <div class="list-view hidden">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="shrink-0">
+        <SourceBadge source={article.source} isJapanese={article.isJapanese} />
+      </div>
+      <h2 class="text-sm font-medium leading-snug truncate min-w-0 flex-1">
+        <a
+          href={article.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-900 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+        >
+          {article.title}<span class="sr-only">（新しいタブで開く）</span>
+        </a>
+      </h2>
+      <span class="text-xs font-medium text-blue-800 bg-blue-100 border border-blue-300 rounded-full px-2 py-0.5 shrink-0 hidden sm:inline">
+        {categoryLabel}
+      </span>
+      {formattedDate && (
+        <time datetime={article.publishedAt} class="text-xs text-gray-500 shrink-0 hidden sm:inline">
+          {formattedDate}
+        </time>
+      )}
+    </div>
+  </div>
 </article>
+
+<style>
+  article[data-view="list"] {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    padding: 0.625rem 0.75rem;
+  }
+  article[data-view="list"] .card-view {
+    display: none;
+  }
+  article[data-view="list"] .list-view {
+    display: block;
+  }
+  article[data-view="list"]:hover {
+    box-shadow: none;
+    background-color: rgb(249 250 251);
+  }
+</style>

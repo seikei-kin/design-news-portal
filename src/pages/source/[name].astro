@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryFilter from '../../components/CategoryFilter.astro';
+import LanguageFilter from '../../components/LanguageFilter.astro';
+import DateGroupedArticles from '../../components/DateGroupedArticles.astro';
+import ViewToggle from '../../components/ViewToggle.astro';
+import type { Article } from '../../types/article';
+import type { GetStaticPaths } from 'astro';
+import { sourceSlug } from '../../utils/slug';
+
+import articlesData from '../../data/articles.json';
+const allArticles = articlesData as Article[];
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const articles = articlesData as Article[];
+  const sourceMap = new Map<string, string>();
+  for (const a of articles) {
+    const slug = sourceSlug(a.source);
+    if (!sourceMap.has(slug)) {
+      sourceMap.set(slug, a.source);
+    }
+  }
+  return [...sourceMap.entries()].map(([slug, sourceName]) => ({
+    params: { name: slug },
+    props: { sourceName },
+  }));
+};
+
+interface Props {
+  sourceName: string;
+}
+
+const { sourceName } = Astro.props;
+const articles = allArticles.filter((a) => a.source === sourceName);
+---
+
+<BaseLayout title={sourceName} description={`${sourceName}の最新記事`}>
+  <div class="space-y-6">
+    <div>
+      <nav class="text-sm text-gray-500 mb-3" aria-label="パンくずリスト">
+        <ol class="flex items-center gap-0 list-none m-0 p-0">
+          <li>
+            <a href="/" class="hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">ホーム</a>
+            <span class="mx-1" aria-hidden="true">/</span>
+          </li>
+          <li>
+            <a href="/about/#sources" class="hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">ソース</a>
+            <span class="mx-1" aria-hidden="true">/</span>
+          </li>
+          <li aria-current="page">
+            <span class="text-gray-900">{sourceName}</span>
+          </li>
+        </ol>
+      </nav>
+      <h1 class="text-2xl font-bold mb-4">{sourceName}</h1>
+      <div class="space-y-3">
+        <CategoryFilter />
+        <LanguageFilter />
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-gray-500" data-article-count>{articles.length}件の記事</p>
+      <ViewToggle />
+    </div>
+
+    <DateGroupedArticles articles={articles} emptyMessage="このソースの記事はまだありません。" />
+  </div>
+</BaseLayout>

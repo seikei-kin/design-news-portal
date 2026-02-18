@@ -1,0 +1,86 @@
+---
+---
+
+<div class="flex items-center gap-2" role="radiogroup" aria-label="言語フィルタ">
+  <button
+    type="button"
+    data-lang-filter="all"
+    class="lang-filter-btn active inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-full min-h-[36px] min-w-[36px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 bg-gray-800 text-white border border-transparent"
+    role="radio"
+    aria-checked="true"
+  >
+    すべて
+  </button>
+  <button
+    type="button"
+    data-lang-filter="ja"
+    class="lang-filter-btn inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-full min-h-[36px] min-w-[36px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+    role="radio"
+    aria-checked="false"
+  >
+    国内
+  </button>
+  <button
+    type="button"
+    data-lang-filter="global"
+    class="lang-filter-btn inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-full min-h-[36px] min-w-[36px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+    role="radio"
+    aria-checked="false"
+  >
+    海外
+  </button>
+</div>
+
+<script>
+  function initLangFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-lang-filter]');
+    const grid = document.querySelector<HTMLElement>('[data-article-grid]');
+    const countEl = document.querySelector<HTMLElement>('[data-article-count]');
+    if (!grid || !buttons.length) return;
+
+    const activeClass = 'bg-gray-800 text-white border border-transparent';
+    const inactiveClass = 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200';
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.langFilter!;
+
+        // Update button states
+        buttons.forEach((b) => {
+          const isActive = b === btn;
+          b.setAttribute('aria-checked', String(isActive));
+          b.className = b.className
+            .replace(activeClass, '')
+            .replace(inactiveClass, '')
+            .trim();
+          b.classList.add(...(isActive ? activeClass.split(' ') : inactiveClass.split(' ')));
+        });
+
+        // Filter articles
+        const cards = grid.querySelectorAll<HTMLElement>('[data-lang]');
+        let visibleCount = 0;
+        cards.forEach((card) => {
+          const lang = card.dataset.lang;
+          const show = filter === 'all' || lang === filter;
+          card.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        });
+
+        // Hide date sections with no visible articles
+        const sections = grid.querySelectorAll<HTMLElement>(':scope > section');
+        sections.forEach((section) => {
+          const visibleCards = section.querySelectorAll<HTMLElement>('[data-lang]:not([style*="display: none"])');
+          section.style.display = visibleCards.length > 0 ? '' : 'none';
+        });
+
+        // Update count
+        if (countEl) {
+          countEl.textContent = `${visibleCount}件の記事`;
+        }
+      });
+    });
+  }
+
+  initLangFilter();
+  document.addEventListener('astro:after-swap', initLangFilter);
+</script>

@@ -14,11 +14,11 @@ const categories = Object.entries(CATEGORIES) as [CategorySlug, string][];
   <a
     href="/"
     class:list={[
-      'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center',
+      'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
       !current
-        ? 'bg-blue-600 text-white'
-        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+        ? 'bg-blue-600 text-white border border-transparent'
+        : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200',
     ]}
     aria-current={!current ? 'page' : undefined}
   >
@@ -28,11 +28,11 @@ const categories = Object.entries(CATEGORIES) as [CategorySlug, string][];
     <a
       href={`/category/${slug}/`}
       class:list={[
-        'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center',
+        'inline-block px-3 py-1.5 text-sm font-medium rounded-full transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
         current === slug
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+          ? 'bg-blue-600 text-white border border-transparent'
+          : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200',
       ]}
       aria-current={current === slug ? 'page' : undefined}
     >

@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CategoryFilter from '../components/CategoryFilter.astro';
-import ArticleCard from '../components/ArticleCard.astro';
+import LanguageFilter from '../components/LanguageFilter.astro';
+import DateGroupedArticles from '../components/DateGroupedArticles.astro';
+import ViewToggle from '../components/ViewToggle.astro';
 import type { Article } from '../types/article';
 
 import articlesData from '../data/articles.json';
@@ -12,15 +14,17 @@ const articles = articlesData as Article[];
   <div class="space-y-6">
     <div>
       <h1 class="text-2xl font-bold mb-4">最新ニュース</h1>
-      <CategoryFilter />
+      <div class="space-y-3">
+        <CategoryFilter />
+        <LanguageFilter />
+      </div>
     </div>
 
-    <p class="text-sm text-gray-500">{articles.length}件の記事</p>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {articles.map((article) => (
-        <ArticleCard article={article} />
-      ))}
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-gray-500" data-article-count>{articles.length}件の記事</p>
+      <ViewToggle />
     </div>
+
+    <DateGroupedArticles articles={articles} />
   </div>
 </BaseLayout>

@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryFilter from '../../components/CategoryFilter.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import LanguageFilter from '../../components/LanguageFilter.astro';
+import DateGroupedArticles from '../../components/DateGroupedArticles.astro';
+import ViewToggle from '../../components/ViewToggle.astro';
 import { CATEGORIES, type CategorySlug } from '../../types/article';
 import type { Article } from '../../types/article';
 import type { GetStaticPaths } from 'astro';
@@ -25,19 +27,17 @@ const articles = allArticles.filter((a) => a.category === categorySlug);
   <div class="space-y-6">
     <div>
       <h1 class="text-2xl font-bold mb-4">{categoryLabel}</h1>
-      <CategoryFilter current={categorySlug} />
+      <div class="space-y-3">
+        <CategoryFilter current={categorySlug} />
+        <LanguageFilter />
+      </div>
     </div>
 
-    <p class="text-sm text-gray-500">{articles.length}件の記事</p>
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-gray-500" data-article-count>{articles.length}件の記事</p>
+      <ViewToggle />
+    </div>
 
-    {articles.length > 0 ? (
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {articles.map((article) => (
-          <ArticleCard article={article} />
-        ))}
-      </div>
-    ) : (
-      <p class="text-gray-500 text-center py-12">このカテゴリの記事はまだありません。</p>
-    )}
+    <DateGroupedArticles articles={articles} emptyMessage="このカテゴリの記事はまだありません。" />
   </div>
 </BaseLayout>

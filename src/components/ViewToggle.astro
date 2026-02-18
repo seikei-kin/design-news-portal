@@ -1,0 +1,96 @@
+---
+---
+
+<div class="flex items-center gap-1" role="radiogroup" aria-label="表示切替">
+  <button
+    type="button"
+    data-view-toggle="card"
+    class="view-toggle-btn inline-flex items-center justify-center p-2 rounded-md min-h-[44px] min-w-[44px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 bg-gray-800 text-white border border-transparent"
+    role="radio"
+    aria-checked="true"
+    aria-label="カード表示"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  </button>
+  <button
+    type="button"
+    data-view-toggle="list"
+    class="view-toggle-btn inline-flex items-center justify-center p-2 rounded-md min-h-[44px] min-w-[44px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+    role="radio"
+    aria-checked="false"
+    aria-label="リスト表示"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  function initViewToggle() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-view-toggle]');
+    const grid = document.querySelector<HTMLElement>('[data-article-grid]');
+    if (!grid || !buttons.length) return;
+
+    const activeClass = 'bg-gray-800 text-white border border-transparent';
+    const inactiveClass = 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200';
+    const STORAGE_KEY = 'view-mode';
+
+    function applyView(mode: string) {
+      // Toggle grid class on each date section's grid container
+      const grids = grid!.querySelectorAll<HTMLElement>('[data-view-grid]');
+      grids.forEach((g) => {
+        if (mode === 'list') {
+          g.classList.remove('grid', 'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4');
+          g.classList.add('flex', 'flex-col', 'gap-0', 'divide-y', 'divide-gray-100');
+        } else {
+          g.classList.add('grid', 'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-4');
+          g.classList.remove('flex', 'flex-col', 'gap-0', 'divide-y', 'divide-gray-100');
+        }
+      });
+
+      // Toggle card/list mode on articles
+      const cards = grid!.querySelectorAll<HTMLElement>('[data-lang]');
+      cards.forEach((card) => {
+        if (mode === 'list') {
+          card.setAttribute('data-view', 'list');
+        } else {
+          card.removeAttribute('data-view');
+        }
+      });
+
+      // Update button states
+      buttons.forEach((b) => {
+        const isActive = b.dataset.viewToggle === mode;
+        b.setAttribute('aria-checked', String(isActive));
+        b.className = b.className
+          .replace(activeClass, '')
+          .replace(inactiveClass, '')
+          .trim();
+        b.classList.add(...(isActive ? activeClass.split(' ') : inactiveClass.split(' ')));
+      });
+    }
+
+    // Restore saved preference
+    const saved = localStorage.getItem(STORAGE_KEY) || 'card';
+    applyView(saved);
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.viewToggle!;
+        localStorage.setItem(STORAGE_KEY, mode);
+        applyView(mode);
+      });
+    });
+  }
+
+  initViewToggle();
+  document.addEventListener('astro:after-swap', initViewToggle);
+</script>

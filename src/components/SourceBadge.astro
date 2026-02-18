@@ -1,13 +1,27 @@
 ---
+import { sourceSlug } from '../utils/slug';
+
 interface Props {
   source: string;
   isJapanese: boolean;
+  linked?: boolean;
 }
 
-const { source, isJapanese } = Astro.props;
+const { source, isJapanese, linked = true } = Astro.props;
+const href = `/source/${sourceSlug(source)}/`;
 ---
 
-<span class="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full px-2.5 py-0.5">
-  {source}
-  {isJapanese && <span class="text-[10px] bg-red-100 text-red-700 rounded px-1">JP</span>}
-</span>
+{linked ? (
+  <a
+    href={href}
+    class="inline-flex items-center gap-1 text-xs font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-full px-2.5 py-0.5 hover:bg-gray-300 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+  >
+    {source}
+    {isJapanese && <span class="text-[10px] bg-red-100 text-red-800 border border-red-300 rounded px-1">JP</span>}
+  </a>
+) : (
+  <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-full px-2.5 py-0.5">
+    {source}
+    {isJapanese && <span class="text-[10px] bg-red-100 text-red-800 border border-red-300 rounded px-1">JP</span>}
+  </span>
+)}

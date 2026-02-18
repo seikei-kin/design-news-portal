@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CATEGORIES } from '../types/article';
+
+// ソース一覧をAboutページ用に定義（feeds-configはスクリプト用なのでここに静的に持つ）
+const japaneseSources = [
+  // アクセシビリティ / インクルーシブ
+  { name: 'Accessible & Usable', url: 'https://accessible-usable.net/', category: 'accessibility' },
+  { name: 'WAIC（ウェブアクセシビリティ基盤委員会）', url: 'https://waic.jp/', category: 'accessibility' },
+  { name: 'soar', url: 'https://soar-world.com/', category: 'accessibility' },
+  { name: 'キコニワ', url: 'https://kikoniwa.com/', category: 'accessibility' },
+  { name: 'freee Developers', url: 'https://developers.freee.co.jp/', category: 'accessibility' },
+  { name: 'Zenn (a11y)', url: 'https://zenn.dev/topics/a11y', category: 'accessibility' },
+  { name: 'note (#アクセシビリティ)', url: 'https://note.com/hashtag/アクセシビリティ', category: 'accessibility' },
+  // UI/UXデザイン
+  { name: 'Goodpatch Blog', url: 'https://goodpatch.com/blog', category: 'ux-design' },
+  { name: 'ベイジの図書館', url: 'https://baigie.me/blog/', category: 'ux-design' },
+  { name: 'U-Site', url: 'https://u-site.jp/', category: 'ux-design' },
+  { name: 'btrax freshtrax', url: 'https://blog.btrax.com/jp/', category: 'ux-design' },
+  { name: 'UXデザインの世界', url: 'https://uxdworld.com/', category: 'ux-design' },
+  { name: 'Design Memo 2.0', url: 'https://designmemo.jp/', category: 'ui-design' },
+  { name: 'unprinted', url: 'https://www.unprinted.design/', category: 'ui-design' },
+  { name: 'AXIS', url: 'https://www.axismag.jp/', category: 'ui-design' },
+  { name: 'DeNA DESIGN', url: 'https://design.dena.com/', category: 'ui-design' },
+  { name: 'Hatena Design Group', url: 'https://design.hatenastaff.com/', category: 'ui-design' },
+  { name: '99designs Blog JP', url: 'https://99designs.jp/blog/', category: 'ui-design' },
+  { name: 'note (#UXデザイン)', url: 'https://note.com/hashtag/UXデザイン', category: 'ux-design' },
+  { name: 'note (#デザイン)', url: 'https://note.com/hashtag/デザイン', category: 'ui-design' },
+  { name: 'Zenn (design)', url: 'https://zenn.dev/topics/design', category: 'ui-design' },
+  // はてなブックマーク
+  { name: 'はてブ (デザイン)', url: 'https://b.hatena.ne.jp/search/tag?q=デザイン', category: 'ui-design' },
+  { name: 'はてブ (アクセシビリティ)', url: 'https://b.hatena.ne.jp/search/tag?q=アクセシビリティ', category: 'accessibility' },
+  // ウェブ/フロントエンド
+  { name: 'コリス', url: 'https://coliss.com/', category: 'frontend' },
+  { name: 'ICS MEDIA', url: 'https://ics.media/', category: 'frontend' },
+  { name: 'LIG Blog', url: 'https://liginc.co.jp/', category: 'web-design' },
+  { name: 'could（長谷川恭久）', url: 'https://yasuhisa.com/could/', category: 'web-design' },
+  { name: 'Stocker.jp', url: 'https://stocker.jp/diary/', category: 'web-design' },
+  { name: 'FASTCODING', url: 'https://fastcoding.jp/blog/', category: 'frontend' },
+  { name: 'POSTD', url: 'https://postd.cc/', category: 'frontend' },
+  { name: 'Developers.IO', url: 'https://dev.classmethod.jp/', category: 'frontend' },
+  { name: 'ZOZO Tech Blog', url: 'https://techblog.zozo.com/', category: 'frontend' },
+  { name: 'サイボウズ フロントエンド', url: 'https://zenn.dev/p/cybozu_frontend', category: 'frontend' },
+  { name: 'Zenn (frontend)', url: 'https://zenn.dev/topics/frontend', category: 'frontend' },
+  // 業界動向
+  { name: 'Web担当者Forum', url: 'https://webtan.impress.co.jp/', category: 'industry' },
+];
+
+const overseasSources = [
+  // アクセシビリティ
+  { name: 'WebAIM Blog', url: 'https://webaim.org/blog/', category: 'accessibility' },
+  { name: 'Deque Blog', url: 'https://www.deque.com/blog/', category: 'accessibility' },
+  { name: 'UK Gov Accessibility Blog', url: 'https://accessibility.blog.gov.uk/', category: 'accessibility' },
+  { name: 'Pope Tech Blog', url: 'https://blog.pope.tech/', category: 'accessibility' },
+  { name: '24 Accessibility', url: 'https://www.24a11y.com/', category: 'accessibility' },
+  // UXデザイン
+  { name: 'Nielsen Norman Group', url: 'https://www.nngroup.com/', category: 'ux-design' },
+  { name: 'UX Planet', url: 'https://uxplanet.org/', category: 'ux-design' },
+  { name: 'UX Collective', url: 'https://uxdesign.cc/', category: 'ux-design' },
+  { name: 'UX News', url: 'https://ux-news.com/', category: 'ux-design' },
+  { name: 'Prototypr', url: 'https://prototypr.io/', category: 'ux-design' },
+  { name: 'Jakob Nielsen (Substack)', url: 'https://jakobnielsenphd.substack.com/', category: 'ux-design' },
+  // UIデザイン / ビジュアルデザイン
+  { name: 'AIGA Eye on Design', url: 'https://eyeondesign.aiga.org/', category: 'ui-design' },
+  { name: 'Brand New (UnderConsideration)', url: 'https://www.underconsideration.com/brandnew/', category: 'ui-design' },
+  { name: 'Creative Boom', url: 'https://www.creativeboom.com/', category: 'ui-design' },
+  { name: 'Abduzeedo', url: 'https://abduzeedo.com/', category: 'ui-design' },
+  { name: 'Dezeen', url: 'https://www.dezeen.com/', category: 'ui-design' },
+  // ウェブデザイン
+  { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/', category: 'web-design' },
+  { name: 'A List Apart', url: 'https://alistapart.com/', category: 'web-design' },
+  { name: 'Codrops', url: 'https://tympanus.net/codrops/', category: 'web-design' },
+  { name: 'Sidebar', url: 'https://sidebar.io/', category: 'web-design' },
+  { name: 'Web Designer News', url: 'https://webdesignernews.com/', category: 'web-design' },
+  { name: 'Creative Bloq', url: 'https://www.creativebloq.com/', category: 'web-design' },
+  // フロントエンド
+  { name: 'CSS-Tricks', url: 'https://css-tricks.com/', category: 'frontend' },
+  { name: 'MDN Blog', url: 'https://developer.mozilla.org/en-US/blog/', category: 'frontend' },
+  // ツール
+  { name: 'Figma Blog', url: 'https://www.figma.com/blog/', category: 'tools' },
+  // 企業デザインブログ
+  { name: 'Slack Design', url: 'https://slack.design/', category: 'ui-design' },
+  { name: 'Spotify Design', url: 'https://spotify.design/', category: 'ui-design' },
+  { name: 'Microsoft Design', url: 'https://microsoft.design/', category: 'ui-design' },
+  // 業界動向
+  { name: 'W3C Blog', url: 'https://www.w3.org/blog/', category: 'industry' },
+  { name: 'Design Week', url: 'https://www.designweek.co.uk/', category: 'industry' },
+  // API
+  { name: 'DEV.to (a11y / ux)', url: 'https://dev.to/', category: 'accessibility' },
+  { name: 'Hacker News (Algolia Search)', url: 'https://news.ycombinator.com/', category: 'industry' },
+];
+
+const categories = Object.entries(CATEGORIES) as [string, string][];
+---
+
+<BaseLayout title="About" description="Design & A11y News について">
+  <div class="max-w-3xl mx-auto space-y-10">
+    <section aria-labelledby="about-heading">
+      <h1 id="about-heading" class="text-2xl font-bold mb-4">About</h1>
+      <div class="prose prose-gray max-w-none space-y-4 text-gray-700 leading-relaxed">
+        <p>
+          <strong>Design & A11y News</strong> は、UI/UXデザイン・ウェブアクセシビリティ・フロントエンド技術に関する最新記事を、国内外60以上のソースから自動収集して一覧表示するニュースポータルサイトです。
+        </p>
+        <p>
+          デザイナー、フロントエンドエンジニア、プロダクトマネージャーなど、デジタルプロダクトに関わるすべての人が、日々の情報収集を効率化できることを目指しています。
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="mechanism-heading">
+      <h2 id="mechanism-heading" class="text-xl font-bold mb-3">仕組み</h2>
+      <div class="space-y-3 text-gray-700 text-sm leading-relaxed">
+        <p>本サイトは静的サイトジェネレータ（Astro）で構築されています。ビルド時に各ソースのRSSフィード・公開APIから記事を自動取得し、キーワードベースで7つのカテゴリに分類して表示しています。</p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>記事の本文はホストしておらず、各記事のリンクは元サイトに直接遷移します</li>
+          <li>カテゴリ分類はタイトルと概要文のキーワードマッチで自動判定しています</li>
+          <li>定期的にビルドを実行することで最新記事に更新されます</li>
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="categories-heading">
+      <h2 id="categories-heading" class="text-xl font-bold mb-3">カテゴリ</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {categories.map(([slug, label]) => (
+          <a href={`/category/${slug}/`} class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+            <span class="text-xs font-medium text-blue-800 bg-blue-100 border border-blue-300 rounded-full px-2 py-0.5">{label}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="sources" aria-labelledby="sources-heading">
+      <h2 id="sources-heading" class="text-xl font-bold mb-4">収集ソース一覧</h2>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span class="text-xs bg-red-100 text-red-800 border border-red-300 rounded px-1.5 py-0.5">JP</span>
+            国内ソース（{japaneseSources.length}件）
+          </h3>
+          <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+            {japaneseSources.map((source) => (
+              <div class="flex items-center justify-between px-4 py-3 text-sm">
+                <a href={source.url} target="_blank" rel="noopener noreferrer" class="text-gray-900 hover:text-blue-600 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">
+                  {source.name}<span class="sr-only">（新しいタブで開く）</span>
+                </a>
+                <span class="text-xs text-blue-800 bg-blue-50 border border-blue-300 rounded-full px-2 py-0.5 shrink-0 ml-2">
+                  {CATEGORIES[source.category as keyof typeof CATEGORIES]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span class="text-xs bg-blue-100 text-blue-800 border border-blue-300 rounded px-1.5 py-0.5">EN</span>
+            海外ソース（{overseasSources.length}件）
+          </h3>
+          <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+            {overseasSources.map((source) => (
+              <div class="flex items-center justify-between px-4 py-3 text-sm">
+                <a href={source.url} target="_blank" rel="noopener noreferrer" class="text-gray-900 hover:text-blue-600 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">
+                  {source.name}<span class="sr-only">（新しいタブで開く）</span>
+                </a>
+                <span class="text-xs text-blue-800 bg-blue-50 border border-blue-300 rounded-full px-2 py-0.5 shrink-0 ml-2">
+                  {CATEGORIES[source.category as keyof typeof CATEGORIES]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="text-sm text-gray-500 border-t border-gray-200 pt-6 space-y-4" aria-labelledby="legal-heading">
+      <h2 id="legal-heading" class="text-base font-bold text-gray-900">著作権・免責事項</h2>
+      <div class="space-y-3">
+        <p>本サイトに掲載されている記事の著作権は、各記事の発信元に帰属します。本サイトはRSSフィード・公開APIを通じてタイトルと概要のみを取得・表示しており、記事本文のホスティングは行っておりません。</p>
+        <p>本サイトは個人が運営する非営利のニュースアグリゲーターです。掲載情報の正確性・完全性について保証するものではありません。本サイトの利用により生じたいかなる損害についても、運営者は責任を負いません。</p>
+        <p>掲載内容の削除をご希望の場合、またはその他お問い合わせは下記までご連絡ください。</p>
+        <p>
+          連絡先:
+          <a href="mailto:nameofthegirl@gmail.com" class="text-blue-700 hover:text-blue-900 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded">
+            nameofthegirl@gmail.com
+          </a>
+        </p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
